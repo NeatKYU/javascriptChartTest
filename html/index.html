@@ -1,0 +1,63 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+    </head>
+    <body>
+        <h1>chart test</h1>
+        <canvas id="myChart"></canvas>
+    </body>
+    <script type="text/javascript">
+      let ctx = document.getElementById("myChart").getContext("2d");
+      const chartDataSet = async (term, sid) => {
+        try {
+          const response = await axios.get(
+            "http://localhost:8000/SALES/COMPANY/GET/" +
+            term +
+            "/PRODUCTS-AMOUNT/" +
+            sid
+          );
+          return response.data;
+        } catch (e) {
+          console.log(e);
+        }
+        };
+        const res = chartDataSet("MONTH", "1002");
+        //console.log("res",res);
+        //const data = res.then(result => result.series)
+        //console.log(data)
+        const NameArr = [];
+        const categories = [];
+
+        let chart = new Chart(ctx, {
+          type: "bar",
+          data: {
+          labels: categories,
+          datasets: NameArr
+        },
+
+          option: {},
+        });
+
+        res.then(result => result.series.map(e => {
+        const eaArr = {
+            label: e.name,
+            data: e.ea
+        }
+        if(e.name){
+            console.log("eaArr",eaArr)
+            NameArr.push(eaArr)
+          }
+        }))
+        res.then(result => result.categories.map(e => {
+          categories.push(e)
+          chart.update();
+        }))
+
+        console.log("NameArr ",NameArr)
+        console.log("categories ", categories)
+  </script>
+</html>
